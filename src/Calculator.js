@@ -29,11 +29,37 @@ export default class Calculator {
     let numbersPart = input;
 
     const customDelimiterMatch = input.match(/^\/\/(.)\\n(.*)$/);
-    if (customDelimiterMatch) {
-      delimiters.push(customDelimiterMatch[1]);
-      numbersPart = customDelimiterMatch[2];
-    }
 
+    
+    if (input.startsWith('//')) {
+      const customDelimiterMatch = input.match(/^\/\/(.?)\\n(.*)$/);
+
+      // \n 없는 경우
+      if (!customDelimiterMatch) {
+        throw new Error('[ERROR] 커스텀 구분자 형식이 잘못되었습니다.');
+      }
+
+      const [_, customDelimiter, rest] = customDelimiterMatch;
+
+      // 구분자가 비어 있는 경우
+      if (!customDelimiter) {
+        throw new Error('[ERROR] 커스텀 구분자를 지정해야 합니다.');
+      }
+
+      // 구분자가 숫자인 경우
+      if (/^\d$/.test(customDelimiter)) {
+        throw new Error('[ERROR] 커스텀 구분자는 숫자가 될 수 없습니다.');
+      }
+
+      // 구분자가 공백인 경우
+      if (/\s/.test(customDelimiter)) {
+        throw new Error('[ERROR] 커스텀 구분자는 공백을 포함할 수 없습니다.');
+      }
+
+      delimiters.push(customDelimiter);
+      numbersPart = rest;
+    }
+    
     const regex = new RegExp(`[${delimiters.join('')}]`);
     const tokens = numbersPart.split(regex);
 
