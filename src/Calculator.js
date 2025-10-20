@@ -16,17 +16,14 @@ export default class Calculator {
     }
     if (input === '') return 0;
 
-    // 널 바이트(\0) 포함 여부
     if (input.includes('\0')) {
       throw new Error('[ERROR] 널 바이트가 포함되어 있습니다.');
     }
 
-    // 제어문자 포함 여부
     if (/[\x00-\x1F]/.test(input)) {
       throw new Error('[ERROR] 입력에 허용되지 않는 제어 문자가 포함되어 있습니다.');
     }
 
-    // 비정상 인코딩 문자 감지 (ASCII + 기본 한글/영문/숫자/기호 외)
     if (/[^\x20-\x7E\uAC00-\uD7AF\u3130-\u318F]/.test(input)) {
       throw new Error('[ERROR] 지원되지 않는 문자 인코딩입니다.');
     }
@@ -44,7 +41,7 @@ export default class Calculator {
         throw new Error('[ERROR] 커스텀 구분자 형식이 잘못되었습니다.');
       }
 
-      const [_, customDelimiter, rest] = customDelimiterMatch;
+      const [, customDelimiter, rest] = customDelimiterMatch;
 
       if (!customDelimiter) {
         throw new Error('[ERROR] 커스텀 구분자를 지정해야 합니다.');
@@ -56,7 +53,7 @@ export default class Calculator {
         throw new Error('[ERROR] 커스텀 구분자는 공백을 포함할 수 없습니다.');
       }
 
-      delimiters.push(customDelimiter);
+      delimiters = [...delimiters, customDelimiter];
       numbersPart = rest;
     }
 
@@ -64,7 +61,7 @@ export default class Calculator {
     const tokens = numbersPart.split(regex);
 
     // =========================
-    // step4: 토큰 단위 유효성 검사 (음수, 실수, 오버플로우 추가)
+    // step4: 토큰 단위 유효성 검사
     // =========================
     const numbers = tokens.map((token) => {
       const trimmed = token.trim();
@@ -76,28 +73,28 @@ export default class Calculator {
       if (!/^\d+$/.test(trimmed)) {
         if (/^-/.test(trimmed)) {
           throw new Error(`[ERROR] 음수는 허용되지 않습니다: ${trimmed}`);
-        } else if (/^\d*\.\d+$/.test(trimmed)) {
-          throw new Error(`[ERROR] 소수(실수)는 허용되지 않습니다: "${trimmed}"`);
-        } else {
-          throw new Error(`[ERROR] 숫자가 아닌 값이 포함되어 있습니다: "${token}"`);
         }
+        if (/^\d*\.\d+$/.test(trimmed)) {
+          throw new Error(`[ERROR] 소수(실수)는 허용되지 않습니다: ${trimmed}`);
+        }
+        throw new Error(`[ERROR] 숫자가 아닌 값이 포함되어 있습니다: ${token}`);
       }
 
       if (trimmed.length > MAX_DIGITS) {
-        throw new Error(`[ERROR] 숫자 값이 허용 범위를 초과했습니다: "${token}"`);
+        throw new Error(`[ERROR] 숫자 값이 허용 범위를 초과했습니다: ${token}`);
       }
 
       const num = Number(trimmed);
 
       if (!Number.isSafeInteger(num)) {
-        throw new Error(`[ERROR] 숫자 값이 허용 범위를 초과했습니다: "${token}"`);
+        throw new Error(`[ERROR] 숫자 값이 허용 범위를 초과했습니다: ${token}`);
       }
 
       return num;
     });
 
     // =========================
-    // 합계 계산 시 안전 범위 체크
+    // 합계 계산
     // =========================
     let sum = 0;
     for (const num of numbers) {
