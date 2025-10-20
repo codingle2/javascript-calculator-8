@@ -14,7 +14,7 @@ export default class Calculator {
 
   // step1,6: 입력 존재 / 타입 / 보안 검증
   static validateInput(input) {
-
+    if (input === '') return 0;
     if (input === null || input === undefined || typeof input !== 'string') {
       throw new Error('[ERROR] 입력 값이 존재하지 않거나 문자열이 아닙니다.');
     }
@@ -49,6 +49,8 @@ export default class Calculator {
 
   // step3: 토큰화
   static tokenize({ numbersPart, delimiters }) {
+    // numbersPart가 비어있으면 빈 배열을 반환
+    if (numbersPart === '') return [];
     const regex = new RegExp(`[${delimiters.join('')}]`);
     return numbersPart.split(regex).map(t => t.trim());
   }
