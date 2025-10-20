@@ -7,6 +7,13 @@ export default class App {
   async run() {
     try {
       const input = await Console.readLineAsync('덧셈할 문자열을 입력해주세요.\n');
+      
+      // 빈 문자열 입력 처리
+      if (input === '') {
+        Console.print('결과 : 0');
+        return;
+      }
+
       const result = Calculator.calculate(input);
       Console.print(`결과 : ${result}`);
     } catch (error) {
