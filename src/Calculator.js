@@ -1,4 +1,3 @@
-// src/Calculator.js
 export default class Calculator {
   /**
    * 문자열을 받아서 합계를 계산한다.
@@ -53,7 +52,7 @@ export default class Calculator {
     const tokens = numbersPart.split(regex);
 
     // =========================
-    // step4: 토큰 단위 유효성 검사
+    // step4: 토큰 단위 유효성 검사 (음수, 실수, 오버플로우 추가)
     // =========================
     const numbers = tokens.map((token) => {
       const trimmed = token.trim();
@@ -65,7 +64,13 @@ export default class Calculator {
 
       // 숫자 형식 체크
       if (!/^\d+$/.test(trimmed)) {
-        throw new Error(`[ERROR] 숫자가 아닌 값이 포함되어 있습니다: "${token}"`);
+        if (/^-/.test(trimmed)) {
+          throw new Error(`[ERROR] 음수는 허용되지 않습니다: ${trimmed}`);
+        } else if (/^\d*\.\d+$/.test(trimmed)) {
+          throw new Error(`[ERROR] 소수(실수)는 허용되지 않습니다: "${trimmed}"`);
+        } else {
+          throw new Error(`[ERROR] 숫자가 아닌 값이 포함되어 있습니다: "${token}"`);
+        }
       }
 
       // 토큰 단위 최대 자릿수 초과
