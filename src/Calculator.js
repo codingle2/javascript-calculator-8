@@ -14,7 +14,7 @@ export default class Calculator {
 
   // step1,6: 입력 존재 / 타입 / 보안 검증
   static validateInput(input) {
-    if (input === '') return 0;
+    if (input === '') return '0';
     if (input === null || input === undefined || typeof input !== 'string') {
       throw new Error('[ERROR] 입력 값이 존재하지 않거나 문자열이 아닙니다.');
     }
